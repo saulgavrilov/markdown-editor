@@ -1,0 +1,163 @@
+:root {
+  --body-bg-clr: hsl(0, 0%, 0%);
+  --body-clr: hsl(0, 0%, 100%);
+  --primary-clr: hsl(213, 92%, 49%);
+  --border-clr: hsl(0, 1%, 18%);
+  --border-radius: 5px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+  background: var(--body-bg-clr);
+  color: var(--body-clr);
+}
+
+svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wrapper {
+  width: 980px;
+  margin: 10px;
+}
+
+.editor-container {
+  display: flex;
+  height: auto;
+}
+
+.line-numbers {
+  width: 40px; /* Adjust width as needed */
+  max-width: auto;
+  padding: 10px;
+  white-space: pre-wrap; /* Ensure line breaks are respected */
+  border-left: 1px solid var(--border-clr);
+  border-bottom: 1px solid var(--border-clr);
+}
+
+.line-numbers span {
+  height: 20px;
+  display: block; /* Display each line number on a separate line */
+  font-size: 13px;
+  margin: 4px 0;
+  text-align: right;
+}
+
+.code-input {
+  flex: 1;
+  line-height: 24px;
+  padding: 10px;
+  font-family: monospace;
+  resize: none;
+  height: auto;
+  overflow: hidden;
+  background: black;
+  color: var(--body-clr);
+  border: 1px solid var(--border-clr);
+  outline: none;
+  border-top: none;
+}
+
+nav {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--border-clr);
+}
+
+nav .btns {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+nav h3 {
+  padding-left: 10px;
+  color: lightgray;
+  font-size: 14px;
+}
+
+nav button {
+  height: 100%;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  /* padding: 10px; */
+  gap: 5px;
+  border: none;
+  color: white;
+  background: transparent;
+  cursor: pointer;
+}
+
+nav button:hover {
+  color: var(--primary-clr);
+}
+
+nav button:nth-child(odd) {
+  border-left: 1px solid var(--border-clr);
+}
+
+nav button:nth-child(even) {
+  border-left: 1px solid var(--border-clr);
+}
+
+.language-javascript {
+  color: #f00;
+}
+
+.language-python {
+  color: #3572a5;
+}
+
+.output {
+  width: 980px;
+  margin: 0;
+  flex: 1;
+  padding: 20px;
+  border: 1px solid #2e2d2d;
+  border-top: none;
+  display: none;
+  white-space: pre-line;
+}
+
+.output strong {
+  font-weight: 900;
+}
+
+.output img {
+  width: 100%;
+}
+
+blockquote {
+  border-left: 10px solid #cccccc;
+  padding: 10px;
+  background-color: #f1f1f1;
+  color: black;
+}
+
+.output a {
+  color: var(--primary-clr);
+  text-decoration: none;
+}
+
+.output a:hover {
+  text-decoration: underline;
+}
