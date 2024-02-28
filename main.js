@@ -1,28 +1,14 @@
-const editorContainer = document.querySelector(".editor-container");
-const lineNumbers = document.querySelector(".line-numbers");
-const codeInput = document.querySelector(".code-input");
-const output = document.querySelector(".output");
-const editorBtn = document.querySelector(".editor-btn");
-const previewBtn = document.querySelector(".preview-btn");
 const saveBtn = document.querySelector(".save-btn");
-const settingsBtn = document.querySelector(".settings-btn");
+const editor = document.querySelector(".editor textarea");
+const preview = document.querySelector(".preview");
+let tabbed = false;
 
-function updateUI() {
-  previewBtn.addEventListener("click", () => {
-    editorContainer.style.display = "none";
-    output.style.display = "block";
-  });
-
-  editorBtn.addEventListener("click", () => {
-    editorContainer.style.display = "flex";
-    output.style.display = "none";
-  });
-}
-
-function updateLineNumbers() {
-  const lines = codeInput.value.split("\n");
-  lineNumbers.innerHTML = lines.map((_, i) => `<span>${i + 1}</span>`).join("");
-}
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Tab") {
+    e.preventDefault();
+  }
+});
+// &#9; tab code
 
 function save(codes, fileNmae = "README") {
   const blob = new Blob([codes.value], { type: "text/markdown" });
@@ -53,6 +39,9 @@ function convertor(markdown) {
     image: [/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">'],
     link: [/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>'],
     strikethrough: [/\~\~(.*?)\~\~/g, "<s>$1</s>"],
+    code: [/```(.*?)\n([\s\S]+?)```/g, "<code><pre>$2</pre></code>"],
+    hr: [/---/g, "<hr />"],
+    li: [/^- (.+?)$/gm, "<li>$1</li>"],
   };
 
   const headings = (text) => {
@@ -71,6 +60,9 @@ function convertor(markdown) {
   const link = (text) => text.replace(...regexs.link);
   const image = (text) => text.replace(...regexs.image);
   const strikethrough = (text) => text.replace(...regexs.strikethrough);
+  const code = (text) => text.replace(...regexs.code);
+  const hr = (text) => text.replace(...regexs.hr);
+  const li = (text) => text.replace(...regexs.li);
 
   markdown = headings(markdown);
   markdown = bold(markdown);
@@ -79,15 +71,31 @@ function convertor(markdown) {
   markdown = image(markdown);
   markdown = link(markdown);
   markdown = strikethrough(markdown);
+  markdown = code(markdown);
+  markdown = hr(markdown);
+  markdown = li(markdown);
 
   return markdown;
 }
 
-updateLineNumbers();
-updateUI();
-
-codeInput.addEventListener("input", () => {
-  updateLineNumbers();
-  output.innerHTML = convertor(codeInput.value);
+editor.addEventListener("input", (e) => {
+  preview.innerHTML = convertor(editor.value);
 });
-saveBtn.addEventListener("click", () => save(codeInput));
+
+editor.addEventListener("keydown", (e) => {
+  if (e.key === "Tab") {
+    tabbed = true;
+    editor.setRangeText(
+      "\t",
+      editor.selectionStart,
+      editor.selectionStart,
+      "end"
+    );
+  }
+
+  if (e.key === "Enter") {
+    tabbed = false;
+  }
+});
+
+saveBtn.addEventListener("click", () => save(editor));
