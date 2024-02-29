@@ -95,6 +95,7 @@ main {
   border: none;
   padding: 20px;
   word-wrap: break-word;
+  tab-size: 4;
 }
 
 .preview {
@@ -103,13 +104,14 @@ main {
   height: 100%;
   overflow-y: auto;
   white-space: pre-line;
-}
-
-.preview * {
   word-wrap: break-word;
-  white-space: pre-line;
 }
 
 .preview li {
   margin-left: 40px;
+}
+
+.preview .nli {
+  margin-left: 50px;
+  list-style-type: circle;
 }
