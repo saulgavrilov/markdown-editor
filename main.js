@@ -1,3 +1,4 @@
+const filename = document.querySelector(".filename");
 const saveBtn = document.querySelector(".save-btn");
 const editor = document.querySelector(".editor textarea");
 const preview = document.querySelector(".preview");
@@ -16,7 +17,7 @@ function save(codes, fileNmae = "README") {
   const a = document.createElement("a");
 
   a.href = url;
-  a.download = `${fileNmae}.md`;
+  a.download = `${filename.textContent || fileNmae}.md`;
   a.style.display = "none";
   document.body.appendChild(a);
   a.click();
@@ -34,14 +35,15 @@ function convertor(markdown) {
       h6: [/^######\s(.*)$/gm, "<h6>$1</h6>"],
     },
     bold: [/\*\*(.*?)\*\*/g, "<strong>$1</strong>"],
-    italic: [/\*(.*?)\*/g, "<i>$1</i>"],
+    italic: [/\*(.*?)\*|_(.*?)_/g, "<i>$1$2</i>"],
     blockquotes: [/^>\s(.*)$/gm, "<blockquote>$1</blockquote>"],
     image: [/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">'],
     link: [/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>'],
     strikethrough: [/\~\~(.*?)\~\~/g, "<s>$1</s>"],
-    code: [/```(.*?)\n([\s\S]+?)```/g, "<code><pre>$2</pre></code>"],
-    hr: [/---/g, "<hr />"],
+    code: [/```(.*?)\n([\s\S]+?)```/g, "<pre><code>$2</code></pre>"],
+    hr: [/^([---])/g, "<hr />"],
     li: [/^- (.+?)$/gm, "<li>$1</li>"],
+    nli: [/^\t- (.+?)$/gm, '<li class="nli">$1</li>'],
   };
 
   const headings = (text) => {
@@ -63,6 +65,7 @@ function convertor(markdown) {
   const code = (text) => text.replace(...regexs.code);
   const hr = (text) => text.replace(...regexs.hr);
   const li = (text) => text.replace(...regexs.li);
+  const nli = (text) => text.replace(...regexs.nli);
 
   markdown = headings(markdown);
   markdown = bold(markdown);
@@ -74,12 +77,14 @@ function convertor(markdown) {
   markdown = code(markdown);
   markdown = hr(markdown);
   markdown = li(markdown);
+  markdown = nli(markdown);
 
   return markdown;
 }
 
 editor.addEventListener("input", (e) => {
   preview.innerHTML = convertor(editor.value);
+  preview.innerHTML.trim();
 });
 
 editor.addEventListener("keydown", (e) => {
