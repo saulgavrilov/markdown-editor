@@ -1,5 +1,6 @@
 const filename = document.querySelector(".filename");
 const saveBtn = document.querySelector(".save-btn");
+const file = document.getElementById("fileInput");
 const editor = document.querySelector(".editor textarea");
 const preview = document.querySelector(".preview");
 let tabbed = false;
@@ -24,6 +25,19 @@ function save(codes, fileNmae = "README") {
   window.URL.revokeObjectURL(url);
 }
 
+function useFile(e) {
+  const f = e.target.files[0];
+  const fr = new FileReader();
+
+  if (!f.name.endsWith(".md")) return;
+  fr.addEventListener("loadend", (e) => {
+    editor.value = e.target.result;
+    preview.innerHTML = convertor(editor.value);
+  });
+
+  fr.readAsText(f);
+}
+
 function convertor(markdown) {
   const regexs = {
     headings: {
@@ -41,7 +55,7 @@ function convertor(markdown) {
     link: [/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>'],
     strikethrough: [/\~\~(.*?)\~\~/g, "<s>$1</s>"],
     code: [/```(.*?)\n([\s\S]+?)```/g, "<pre><code>$2</code></pre>"],
-    hr: [/^([---])/g, "<hr />"],
+    hr: [/---/g, "<hr />"],
     li: [/^- (.+?)$/gm, "<li>$1</li>"],
     nli: [/^\t- (.+?)$/gm, '<li class="nli">$1</li>'],
   };
@@ -67,19 +81,35 @@ function convertor(markdown) {
   const li = (text) => text.replace(...regexs.li);
   const nli = (text) => text.replace(...regexs.nli);
 
-  markdown = headings(markdown);
-  markdown = bold(markdown);
-  markdown = italic(markdown);
-  markdown = blockquotes(markdown);
-  markdown = image(markdown);
-  markdown = link(markdown);
-  markdown = strikethrough(markdown);
-  markdown = code(markdown);
-  markdown = hr(markdown);
-  markdown = li(markdown);
-  markdown = nli(markdown);
+  const markdownFunctions = [
+    headings,
+    bold,
+    italic,
+    blockquotes,
+    link,
+    image,
+    strikethrough,
+    code,
+    hr,
+    li,
+    nli,
+  ];
 
-  return markdown;
+  markdownFunctions.forEach((func) => {
+    if (typeof func !== "function") {
+      throw new Error(
+        "One or more items in markdownFunctions array is not a function"
+      );
+    }
+  });
+
+  const applyMarkdownFunctions = (text) => {
+    return markdownFunctions.reduce((result, func) => func(result), text || "");
+  };
+
+  const formattedMarkdown = applyMarkdownFunctions(markdown);
+
+  return formattedMarkdown;
 }
 
 editor.addEventListener("input", (e) => {
@@ -104,3 +134,4 @@ editor.addEventListener("keydown", (e) => {
 });
 
 saveBtn.addEventListener("click", () => save(editor));
+file.addEventListener("change", useFile);
